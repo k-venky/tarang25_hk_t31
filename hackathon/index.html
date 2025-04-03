@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration & Login</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+      .container {
+        width: 300px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      h2 {
+        margin-bottom: 20px;
+      }
+      input,
+      select,
+      button {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        background-color: #212529;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #212529;
+      }
+    </style>
+    <script>
+      function showRegister() {
+        document.getElementById("login-container").style.display = "none";
+        document.getElementById("register-container").style.display = "block";
+      }
+      function showLogin() {
+        document.getElementById("register-container").style.display = "none";
+        document.getElementById("login-container").style.display = "block";
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container" id="register-container">
+      <h2>Register</h2>
+      <form
+        action="register.php"
+        method="POST"
+        onsubmit="return redirectToLogin(event)"
+      >
+        <input type="text" name="name" placeholder="Full Name" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <select name="role" required>
+          <option value="">Select Role</option>
+          <option value="student">Student</option>
+          <option value="faculty">Faculty</option>
+          <option value="admin">Administrator</option>
+        </select>
+        <button type="submit">Register</button>
+      </form>
+      <p>
+        Already have an account?
+        <a href="#" onclick="showLogin()">Login here</a>
+      </p>
+    </div>
+    <div class="container" id="login-container" style="display: none">
+      <h2>Login</h2>
+      <form
+        id="login-form"
+        action="login.php"
+        method="POST"
+        onsubmit="return handleLogin(event)"
+      >
+        <input type="email" name="email" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <select name="role" required>
+          <option value="">Select Role</option>
+          <option value="student">Student</option>
+          <option value="faculty">Faculty</option>
+          <option value="admin">Administrator</option>
+        </select>
+        <button type="submit">Login</button>
+      </form>
+      <p>
+        Create new account?
+        <a href="#" onclick="showRegister()">Register now</a>
+      </p>
+    </div>
+    <script>
+      function redirectToLogin(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch("register.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            alert("Registration successful! Redirecting to login page.");
+            document.getElementById("register-container").style.display =
+              "none";
+            document.getElementById("login-container").style.display = "block";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function handleLogin(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch("login.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              let redirectPage = "";
+              switch (data.role) {
+                case "student":
+                  redirectPage = "student.php";
+                  break;
+                case "faculty":
+                  redirectPage = "faculty.php";
+                  break;
+                case "admin":
+                  redirectPage = "administration.php";
+                  break;
+                default:
+                  redirectPage = "index.html";
+              }
+              alert("Login successful! Redirecting...");
+              window.location.href = redirectPage;
+            } else {
+              alert("Invalid login credentials or role mismatch.");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>
